@@ -10,7 +10,7 @@ import { isGitRepository } from '../utils/gitUtils.js';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { GEMINI_CONFIG_DIR } from '../tools/memoryTool.js';
+import { AGENTIC_CONFIG_DIR } from '../tools/memoryTool.js';
 
 // Mock tool names if they are dynamically generated or complex
 vi.mock('../tools/ls', () => ({ LSTool: { Name: 'list_directory' } }));
@@ -143,8 +143,9 @@ describe('Core System Prompt (prompts.ts)', () => {
 
     it('should read from default path when GEMINI_SYSTEM_MD is "true"', () => {
       const defaultPath = path.resolve(
-        path.join(GEMINI_CONFIG_DIR, 'system.md'),
+        path.join(AGENTIC_CONFIG_DIR, 'system.md'),
       );
+
       vi.stubEnv('GEMINI_SYSTEM_MD', 'true');
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue('custom system prompt');
@@ -156,7 +157,7 @@ describe('Core System Prompt (prompts.ts)', () => {
 
     it('should read from default path when GEMINI_SYSTEM_MD is "1"', () => {
       const defaultPath = path.resolve(
-        path.join(GEMINI_CONFIG_DIR, 'system.md'),
+        path.join(AGENTIC_CONFIG_DIR, 'system.md'),
       );
       vi.stubEnv('GEMINI_SYSTEM_MD', '1');
       vi.mocked(fs.existsSync).mockReturnValue(true);
@@ -211,7 +212,7 @@ describe('Core System Prompt (prompts.ts)', () => {
 
     it('should write to default path when GEMINI_WRITE_SYSTEM_MD is "true"', () => {
       const defaultPath = path.resolve(
-        path.join(GEMINI_CONFIG_DIR, 'system.md'),
+        path.join(AGENTIC_CONFIG_DIR, 'system.md'),
       );
       vi.stubEnv('GEMINI_WRITE_SYSTEM_MD', 'true');
       getCoreSystemPrompt();
@@ -223,7 +224,7 @@ describe('Core System Prompt (prompts.ts)', () => {
 
     it('should write to default path when GEMINI_WRITE_SYSTEM_MD is "1"', () => {
       const defaultPath = path.resolve(
-        path.join(GEMINI_CONFIG_DIR, 'system.md'),
+        path.join(AGENTIC_CONFIG_DIR, 'system.md'),
       );
       vi.stubEnv('GEMINI_WRITE_SYSTEM_MD', '1');
       getCoreSystemPrompt();
@@ -267,6 +268,38 @@ describe('Core System Prompt (prompts.ts)', () => {
         path.resolve(expectedPath),
         expect.any(String),
       );
+    });
+  });
+
+  describe('Model identity integration', () => {
+    it('should include model identity information when currentModel is provided', () => {
+      vi.stubEnv('SANDBOX', undefined);
+      const modelName = 'gpt-oss:latest';
+      const prompt = getCoreSystemPrompt(undefined, modelName);
+      
+      expect(prompt).toContain('# Model Identity');
+      expect(prompt).toContain(modelName);
+      expect(prompt).toContain('If asked about your identity or which model you are');
+      expect(prompt).toMatchSnapshot();
+    });
+
+    it('should not include model identity section when currentModel is not provided', () => {
+      vi.stubEnv('SANDBOX', undefined);
+      const prompt = getCoreSystemPrompt();
+      
+      expect(prompt).not.toContain('# Model Identity');
+    });
+
+    it('should include model identity with user memory when both are provided', () => {
+      vi.stubEnv('SANDBOX', undefined);
+      const modelName = 'llama3.1:latest';
+      const userMemory = 'Remember to be concise in responses';
+      const prompt = getCoreSystemPrompt(userMemory, modelName);
+      
+      expect(prompt).toContain('# Model Identity');
+      expect(prompt).toContain(modelName);
+      expect(prompt).toContain('---\n\n' + userMemory); // Memory should be at the end
+      expect(prompt).toMatchSnapshot();
     });
   });
 });

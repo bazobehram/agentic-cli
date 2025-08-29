@@ -8,7 +8,7 @@ import type {
   CompressionStatus,
   ToolCallConfirmationDetails,
   ToolResultDisplay,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import type { PartListUnion } from '@google/genai';
 
 // Only defining the state enum needed by the UI
@@ -244,7 +244,7 @@ export interface SubmitPromptResult {
 }
 
 /**
- * Defines the result of the slash command processor for its consumer (useGeminiStream).
+ * Defines the result of the slash command processor for its consumer (useAIStream).
  */
 export type SlashCommandProcessorResult =
   | {

@@ -8,7 +8,7 @@
 import type { Mock, MockInstance } from 'vitest';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useGeminiStream } from './useGeminiStream.js';
+import { useAIStream } from './useAIStream.js';
 import { useKeypress } from './useKeypress.js';
 import * as atCommandProcessor from './atCommandProcessor.js';
 import type {
@@ -23,13 +23,13 @@ import type {
   EditorType,
   GeminiClient,
   AnyToolInvocation,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import {
   ApprovalMode,
   AuthType,
   GeminiEventType as ServerGeminiEventType,
   ToolErrorType,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import type { Part, PartListUnion } from '@google/genai';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';
 import type { HistoryItem, SlashCommandProcessorResult } from '../types.js';
@@ -56,7 +56,7 @@ const MockedUserPromptEvent = vi.hoisted(() =>
 );
 const mockParseAndFormatApiError = vi.hoisted(() => vi.fn());
 
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
+vi.mock('agentic-cli-core', async (importOriginal) => {
   const actualCoreModule = (await importOriginal()) as any;
   return {
     ...actualCoreModule,
@@ -130,8 +130,8 @@ vi.mock('./slashCommandProcessor.js', () => ({
 
 // --- END MOCKS ---
 
-// --- Tests for useGeminiStream Hook ---
-describe('useGeminiStream', () => {
+// --- Tests for useAIStream Hook ---
+describe('useAIStream', () => {
   let mockAddItem: Mock;
   let mockConfig: Config;
   let mockOnDebugMessage: Mock;
@@ -272,7 +272,7 @@ describe('useGeminiStream', () => {
         if (props.toolCalls) {
           setToolCalls(props.toolCalls);
         }
-        return useGeminiStream(
+        return useAIStream(
           props.client,
           props.history,
           props.addItem,
@@ -433,7 +433,7 @@ describe('useGeminiStream', () => {
     });
 
     renderHook(() =>
-      useGeminiStream(
+      useAIStream(
         new MockedGeminiClientClass(mockConfig),
         [],
         mockAddItem,
@@ -512,7 +512,7 @@ describe('useGeminiStream', () => {
     });
 
     renderHook(() =>
-      useGeminiStream(
+      useAIStream(
         client,
         [],
         mockAddItem,
@@ -620,7 +620,7 @@ describe('useGeminiStream', () => {
     });
 
     renderHook(() =>
-      useGeminiStream(
+      useAIStream(
         client,
         [],
         mockAddItem,
@@ -729,7 +729,7 @@ describe('useGeminiStream', () => {
     });
 
     const { result, rerender } = renderHook(() =>
-      useGeminiStream(
+      useAIStream(
         new MockedGeminiClientClass(mockConfig),
         [],
         mockAddItem,
@@ -858,7 +858,7 @@ describe('useGeminiStream', () => {
       mockSendMessageStream.mockReturnValue(mockStream);
 
       const { result } = renderHook(() =>
-        useGeminiStream(
+        useAIStream(
           mockConfig.getGeminiClient(),
           [],
           mockAddItem,
@@ -1169,7 +1169,7 @@ describe('useGeminiStream', () => {
       });
 
       renderHook(() =>
-        useGeminiStream(
+        useAIStream(
           new MockedGeminiClientClass(mockConfig),
           [],
           mockAddItem,
@@ -1222,7 +1222,7 @@ describe('useGeminiStream', () => {
       } as unknown as Config;
 
       const { result } = renderHook(() =>
-        useGeminiStream(
+        useAIStream(
           new MockedGeminiClientClass(testConfig),
           [],
           mockAddItem,
@@ -1272,7 +1272,7 @@ describe('useGeminiStream', () => {
       );
 
       const { result } = renderHook(() =>
-        useGeminiStream(
+        useAIStream(
           new MockedGeminiClientClass(mockConfig),
           [],
           mockAddItem,
@@ -1320,7 +1320,7 @@ describe('useGeminiStream', () => {
       );
 
       const { result } = renderHook(() =>
-        useGeminiStream(
+        useAIStream(
           new MockedGeminiClientClass(mockConfig),
           [],
           mockAddItem,
@@ -1369,7 +1369,7 @@ describe('useGeminiStream', () => {
       );
 
       const { result } = renderHook(() =>
-        useGeminiStream(
+        useAIStream(
           new MockedGeminiClientClass(mockConfig),
           [],
           mockAddItem,
@@ -1458,7 +1458,7 @@ describe('useGeminiStream', () => {
         );
 
         const { result } = renderHook(() =>
-          useGeminiStream(
+          useAIStream(
             new MockedGeminiClientClass(mockConfig),
             [],
             mockAddItem,
@@ -1508,7 +1508,7 @@ describe('useGeminiStream', () => {
     });
 
     const { result } = renderHook(() =>
-      useGeminiStream(
+      useAIStream(
         mockConfig.getGeminiClient() as GeminiClient,
         [],
         mockAddItem,
@@ -1572,7 +1572,7 @@ describe('useGeminiStream', () => {
       );
 
       const { result } = renderHook(() =>
-        useGeminiStream(
+        useAIStream(
           new MockedGeminiClientClass(mockConfig),
           [],
           mockAddItem,
@@ -1650,7 +1650,7 @@ describe('useGeminiStream', () => {
       );
 
       const { result } = renderHook(() =>
-        useGeminiStream(
+        useAIStream(
           new MockedGeminiClientClass(mockConfig),
           [],
           mockAddItem,
@@ -1704,7 +1704,7 @@ describe('useGeminiStream', () => {
       );
 
       const { result } = renderHook(() =>
-        useGeminiStream(
+        useAIStream(
           new MockedGeminiClientClass(mockConfig),
           [],
           mockAddItem,

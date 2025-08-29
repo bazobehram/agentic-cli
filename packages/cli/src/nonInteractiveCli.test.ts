@@ -8,22 +8,22 @@ import type {
   Config,
   ToolRegistry,
   ServerGeminiStreamEvent,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import {
   executeToolCall,
   ToolErrorType,
   shutdownTelemetry,
   GeminiEventType,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import type { Part } from '@google/genai';
 import { runNonInteractive } from './nonInteractiveCli.js';
 import { vi } from 'vitest';
 
 // Mock core modules
 vi.mock('./ui/hooks/atCommandProcessor.js');
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
+vi.mock('agentic-cli-core', async (importOriginal) => {
   const original =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+    await importOriginal<typeof import('agentic-cli-core')>();
   return {
     ...original,
     executeToolCall: vi.fn(),
@@ -301,7 +301,7 @@ describe('runNonInteractive', () => {
       shouldProceed: true,
     });
 
-    // Mock a simple stream response from the Gemini client
+    // Mock a simple stream response from the agentic-client
     const events: ServerGeminiStreamEvent[] = [
       { type: GeminiEventType.Content, value: 'Summary complete.' },
     ];

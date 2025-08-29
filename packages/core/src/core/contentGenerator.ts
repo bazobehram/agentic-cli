@@ -14,12 +14,13 @@ import type {
 } from '@google/genai';
 import { GoogleGenAI } from '@google/genai';
 import { createCodeAssistContentGenerator } from '../code_assist/codeAssist.js';
-import { DEFAULT_GEMINI_MODEL } from '../config/models.js';
 import type { Config } from '../config/config.js';
 
 import type { UserTierId } from '../code_assist/types.js';
 import { LoggingContentGenerator } from './loggingContentGenerator.js';
 import { InstallationManager } from '../utils/installationManager.js';
+import { createLocalContentGenerator } from '../llm/LocalContentGenerator.js';
+import type { LocalLLMConfig } from '../llm/LocalLLMAdapter.js';
 
 /**
  * Interface abstracting the core functionalities for generating content and counting tokens.
@@ -47,6 +48,7 @@ export enum AuthType {
   USE_GEMINI = 'gemini-api-key',
   USE_VERTEX_AI = 'vertex-ai',
   CLOUD_SHELL = 'cloud-shell',
+  LOCAL_LLM = 'local-llm',
 }
 
 export type ContentGeneratorConfig = {
@@ -55,6 +57,17 @@ export type ContentGeneratorConfig = {
   vertexai?: boolean;
   authType?: AuthType | undefined;
   proxy?: string | undefined;
+  // Local LLM specific configuration
+  localLLM?: {
+    provider: 'ollama' | 'llamafile' | 'lmstudio' | 'custom';
+    host?: string;
+    port?: number;
+    timeout?: number;
+    maxRetries?: number;
+    temperature?: number;
+    maxTokens?: number;
+    contextSize?: number;
+  };
 };
 
 export function createContentGeneratorConfig(
@@ -66,8 +79,8 @@ export function createContentGeneratorConfig(
   const googleCloudProject = process.env['GOOGLE_CLOUD_PROJECT'] || undefined;
   const googleCloudLocation = process.env['GOOGLE_CLOUD_LOCATION'] || undefined;
 
-  // Use runtime model from config if available; otherwise, fall back to parameter or default
-  const effectiveModel = config.getModel() || DEFAULT_GEMINI_MODEL;
+  // Use the base model from config to avoid circular dependency during initialization
+  const effectiveModel = config.getBaseModel();
 
   const contentGeneratorConfig: ContentGeneratorConfig = {
     model: effectiveModel,
@@ -96,6 +109,26 @@ export function createContentGeneratorConfig(
   ) {
     contentGeneratorConfig.apiKey = googleApiKey;
     contentGeneratorConfig.vertexai = true;
+
+    return contentGeneratorConfig;
+  }
+
+  // Local LLM configuration
+  if (authType === AuthType.LOCAL_LLM) {
+    const localLLMHost = process.env['LOCAL_LLM_HOST'] || 'localhost';
+    const localLLMPort = parseInt(process.env['LOCAL_LLM_PORT'] || '11434', 10);
+    const localLLMProvider = (process.env['LOCAL_LLM_PROVIDER'] || 'ollama') as 'ollama' | 'llamafile' | 'lmstudio' | 'custom';
+    
+    contentGeneratorConfig.localLLM = {
+      provider: localLLMProvider,
+      host: localLLMHost,
+      port: localLLMPort,
+      timeout: parseInt(process.env['LOCAL_LLM_TIMEOUT'] || '60000', 10),
+      maxRetries: parseInt(process.env['LOCAL_LLM_MAX_RETRIES'] || '3', 10),
+      temperature: parseFloat(process.env['LOCAL_LLM_TEMPERATURE'] || '0.7'),
+      maxTokens: parseInt(process.env['LOCAL_LLM_MAX_TOKENS'] || '2048', 10),
+      contextSize: parseInt(process.env['LOCAL_LLM_CONTEXT_SIZE'] || '4096', 10),
+    };
 
     return contentGeneratorConfig;
   }
@@ -152,6 +185,30 @@ export async function createContentGenerator(
     });
     return new LoggingContentGenerator(googleGenAI.models, gcConfig);
   }
+
+  if (config.authType === AuthType.LOCAL_LLM) {
+    if (!config.localLLM) {
+      throw new Error('Local LLM configuration is required when using LOCAL_LLM auth type');
+    }
+
+    const localLLMConfig: LocalLLMConfig = {
+      provider: config.localLLM.provider,
+      host: config.localLLM.host || 'localhost',
+      port: config.localLLM.port || 11434,
+      model: config.model,
+      timeout: config.localLLM.timeout || 60000,
+      maxRetries: config.localLLM.maxRetries || 3,
+      temperature: config.localLLM.temperature || 0.7,
+      maxTokens: config.localLLM.maxTokens || 2048,
+      contextSize: config.localLLM.contextSize || 4096,
+    };
+
+    return new LoggingContentGenerator(
+      createLocalContentGenerator(localLLMConfig),
+      gcConfig
+    );
+  }
+
   throw new Error(
     `Error creating contentGenerator: Unsupported authType: ${config.authType}`,
   );

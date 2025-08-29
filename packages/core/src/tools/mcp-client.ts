@@ -93,7 +93,7 @@ export class McpClient {
     private readonly debugMode: boolean,
   ) {
     this.client = new Client({
-      name: `gemini-cli-mcp-client-${this.serverName}`,
+      name: `agentic-cli-mcp-client-${this.serverName}`,
       version: '0.0.1',
     });
   }
@@ -810,7 +810,7 @@ export async function connectToMcpServer(
   workspaceContext: WorkspaceContext,
 ): Promise<Client> {
   const mcpClient = new Client({
-    name: 'gemini-cli-mcp-client',
+    name: 'agentic-cli-mcp-client',
     version: '0.0.1',
   });
 

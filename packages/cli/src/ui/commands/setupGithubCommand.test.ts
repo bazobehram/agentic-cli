@@ -84,7 +84,7 @@ describe('setupGithubCommand', async () => {
 
     const expectedSubstrings = [
       `set -eEuo pipefail`,
-      `fakeOpenCommand "https://github.com/google-github-actions/run-gemini-cli`,
+      `fakeOpenCommand "https://github.com/google-github-actions/run-agentic-cli`,
     ];
 
     for (const substring of expectedSubstrings) {

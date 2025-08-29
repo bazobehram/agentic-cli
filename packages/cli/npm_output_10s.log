@@ -1,0 +1,12 @@
+
+> agentic-cli@0.2.2 start
+> node dist/index.js
+
+No input provided via stdin. Input can be provided by piping data into agentic-cli or using the --prompt option.
+npm error Lifecycle script `start` failed with error:
+npm error code 1
+npm error path D:\Projects\agentic-cli\packages\cli
+npm error workspace agentic-cli@0.2.2
+npm error location D:\Projects\agentic-cli\packages\cli
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c node dist/index.js

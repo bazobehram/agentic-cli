@@ -16,16 +16,16 @@ import type {
   SandboxConfig,
   GeminiClient,
   AuthType,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import {
   ApprovalMode,
   ideContext,
   Config as ServerConfig,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import type { SettingsFile, Settings } from '../config/settings.js';
 import { LoadedSettings } from '../config/settings.js';
 import process from 'node:process';
-import { useGeminiStream } from './hooks/useGeminiStream.js';
+import { useAIStream } from './hooks/useAIStream.js';
 import { useConsoleMessages } from './hooks/useConsoleMessages.js';
 import type { ConsoleMessageItem } from './types.js';
 import { StreamingState } from './types.js';
@@ -97,10 +97,10 @@ interface MockServerConfig {
   getScreenReader: Mock<() => boolean>;
 }
 
-// Mock @google/gemini-cli-core and its Config class
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
+// Mock agentic-cli-core and its Config class
+vi.mock('agentic-cli-core', async (importOriginal) => {
   const actualCore =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+    await importOriginal<typeof import('agentic-cli-core')>();
   const ConfigClassMock = vi
     .fn()
     .mockImplementation((optionsPassedToConstructor) => {
@@ -196,8 +196,8 @@ vi.mock('@google/gemini-cli-core', async (importOriginal) => {
 });
 
 // Mock heavy dependencies or those with side effects
-vi.mock('./hooks/useGeminiStream', () => ({
-  useGeminiStream: vi.fn(() => ({
+vi.mock('./hooks/useAIStream', () => ({
+  useAIStream: vi.fn(() => ({
     streamingState: 'Idle',
     submitQuery: vi.fn(),
     initError: null,
@@ -272,7 +272,7 @@ vi.mock('../hooks/useTerminalSize.js', () => ({
 
 const mockedCheckForUpdates = vi.mocked(checkForUpdates);
 const { isGitRepository: mockedIsGitRepository } = vi.mocked(
-  await import('@google/gemini-cli-core'),
+  await import('agentic-cli-core'),
 );
 
 vi.mock('node:child_process');
@@ -383,11 +383,11 @@ describe('App UI', () => {
       mockedIsGitRepository.mockResolvedValue(true);
       const info: UpdateObject = {
         update: {
-          name: '@google/gemini-cli',
+          name: '@google/agentic-cli',
           latest: '1.1.0',
           current: '1.0.0',
         },
-        message: 'Gemini CLI update available!',
+        message: 'agentic-cli update available!',
       };
       mockedCheckForUpdates.mockResolvedValue(info);
       const { spawn } = await import('node:child_process');
@@ -411,7 +411,7 @@ describe('App UI', () => {
       mockedIsGitRepository.mockResolvedValue(false);
       const info: UpdateObject = {
         update: {
-          name: '@google/gemini-cli',
+          name: '@google/agentic-cli',
           latest: '1.1.0',
           current: '1.0.0',
         },
@@ -442,7 +442,7 @@ describe('App UI', () => {
       mockedIsGitRepository.mockResolvedValue(false);
       const info: UpdateObject = {
         update: {
-          name: '@google/gemini-cli',
+          name: '@google/agentic-cli',
           latest: '1.1.0',
           current: '1.0.0',
         },
@@ -473,7 +473,7 @@ describe('App UI', () => {
       mockedIsGitRepository.mockResolvedValue(false);
       const info: UpdateObject = {
         update: {
-          name: '@google/gemini-cli',
+          name: '@google/agentic-cli',
           latest: '1.1.0',
           current: '1.0.0',
         },
@@ -507,7 +507,7 @@ describe('App UI', () => {
       process.env.GEMINI_CLI_DISABLE_AUTOUPDATER = 'true';
       const info: UpdateObject = {
         update: {
-          name: '@google/gemini-cli',
+          name: '@google/agentic-cli',
           latest: '1.1.0',
           current: '1.0.0',
         },
@@ -1027,7 +1027,7 @@ describe('App UI', () => {
   });
 
   it('should render correctly with the prompt input box', () => {
-    vi.mocked(useGeminiStream).mockReturnValue({
+    vi.mocked(useAIStream).mockReturnValue({
       streamingState: StreamingState.Idle,
       submitQuery: vi.fn(),
       initError: null,
@@ -1052,7 +1052,7 @@ describe('App UI', () => {
 
       mockConfig.getQuestion = vi.fn(() => 'hello from prompt-interactive');
 
-      vi.mocked(useGeminiStream).mockReturnValue({
+      vi.mocked(useAIStream).mockReturnValue({
         streamingState: StreamingState.Idle,
         submitQuery: mockSubmitQuery,
         initError: null,
@@ -1297,7 +1297,7 @@ describe('App UI', () => {
     });
 
     it('should queue messages when handleFinalSubmit is called during streaming', () => {
-      vi.mocked(useGeminiStream).mockReturnValue({
+      vi.mocked(useAIStream).mockReturnValue({
         streamingState: StreamingState.Responding,
         submitQuery: mockSubmitQuery,
         initError: null,
@@ -1322,7 +1322,7 @@ describe('App UI', () => {
       const mockSubmitQueryFn = vi.fn();
 
       // Start with Responding state
-      vi.mocked(useGeminiStream).mockReturnValue({
+      vi.mocked(useAIStream).mockReturnValue({
         streamingState: StreamingState.Responding,
         submitQuery: mockSubmitQueryFn,
         initError: null,
@@ -1340,7 +1340,7 @@ describe('App UI', () => {
       currentUnmount = unmount;
 
       // Simulate the hook returning Idle state (streaming completed)
-      vi.mocked(useGeminiStream).mockReturnValue({
+      vi.mocked(useAIStream).mockReturnValue({
         streamingState: StreamingState.Idle,
         submitQuery: mockSubmitQueryFn,
         initError: null,
@@ -1369,7 +1369,7 @@ describe('App UI', () => {
       // and then checking the rendered output for the queued messages
       // with the ▸ prefix and dimColor styling
 
-      vi.mocked(useGeminiStream).mockReturnValue({
+      vi.mocked(useAIStream).mockReturnValue({
         streamingState: StreamingState.Responding,
         submitQuery: mockSubmitQuery,
         initError: null,
@@ -1396,7 +1396,7 @@ describe('App UI', () => {
       const mockSubmitQueryFn = vi.fn();
 
       // Start with idle to allow message queue to process
-      vi.mocked(useGeminiStream).mockReturnValue({
+      vi.mocked(useAIStream).mockReturnValue({
         streamingState: StreamingState.Idle,
         submitQuery: mockSubmitQueryFn,
         initError: null,
@@ -1425,7 +1425,7 @@ describe('App UI', () => {
       // The handleFinalSubmit function trims and checks if length > 0
       // before adding to queue, so empty messages are filtered
 
-      vi.mocked(useGeminiStream).mockReturnValue({
+      vi.mocked(useAIStream).mockReturnValue({
         streamingState: StreamingState.Idle,
         submitQuery: mockSubmitQuery,
         initError: null,
@@ -1453,7 +1453,7 @@ describe('App UI', () => {
 
       const mockSubmitQueryFn = vi.fn();
 
-      vi.mocked(useGeminiStream).mockReturnValue({
+      vi.mocked(useAIStream).mockReturnValue({
         streamingState: StreamingState.Idle,
         submitQuery: mockSubmitQueryFn,
         initError: null,
@@ -1481,7 +1481,7 @@ describe('App UI', () => {
       // This test verifies the display logic handles multiple messages correctly
       // by checking that the MAX_DISPLAYED_QUEUED_MESSAGES constant is respected
 
-      vi.mocked(useGeminiStream).mockReturnValue({
+      vi.mocked(useAIStream).mockReturnValue({
         streamingState: StreamingState.Responding,
         submitQuery: mockSubmitQuery,
         initError: null,
@@ -1512,7 +1512,7 @@ describe('App UI', () => {
       // Test that the message queue display logic renders correctly
       // This verifies the UI changes for performance improvements work
 
-      vi.mocked(useGeminiStream).mockReturnValue({
+      vi.mocked(useAIStream).mockReturnValue({
         streamingState: StreamingState.Responding,
         submitQuery: mockSubmitQuery,
         initError: null,
@@ -1601,7 +1601,7 @@ describe('App UI', () => {
       let onCancelSubmitCallback = () => {};
 
       // Simulate a tool in the "Executing" state.
-      vi.mocked(useGeminiStream).mockImplementation(
+      vi.mocked(useAIStream).mockImplementation(
         (
           _client,
           _history,

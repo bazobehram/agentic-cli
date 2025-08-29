@@ -1,10 +1,29 @@
-# Welcome to Gemini CLI documentation
+# Welcome to agentic-cli documentation
 
-This documentation provides a comprehensive guide to installing, using, and developing Gemini CLI. This tool lets you interact with Gemini models through a command-line interface.
+This documentation provides a comprehensive guide to installing, using, and developing agentic-cli. This tool lets you interact with AI models through a command-line interface.
+
+## Project Vision
+
+**agentic-cli** aims to transform the original Google Gemini CLI from a cloud-dependent tool into a fully **local, open-source, multi-agent development environment** that works entirely on your own machine without sending data to external services.
+
+### 🎯 Core Goals:
+
+1. **🏠 Local-First Architecture**: Replace Google Gemini API dependency with local LLM adapters (Ollama, etc.)
+2. **🤖 Multi-Agent System**: Implement specialized agents (researcher, coder, critic) that can delegate tasks to each other
+3. **🖥️ Warp.dev-Style Experience**: Rich Terminal UI (TUI) for monitoring agent workflows and interactions
+4. **🔧 Comprehensive Toolset**: File operations, code execution, safe shell commands with user approval
+5. **🔓 Fully Open Source**: Extensible architecture where users can easily add custom models, tools, and agents
+
+### ✨ Key Features (Planned):
+- **Privacy-First**: All processing happens locally, no data sent to external services
+- **Agent Orchestration**: Multiple specialized AI agents working together
+- **Visual Workflow**: Real-time TUI showing agent interactions and progress
+- **Modular Design**: Easy to swap LLM backends, add new tools, or create custom agents
+- **Developer-Friendly**: Built by and for developers who want control and transparency
 
 ## Overview
 
-Gemini CLI brings the capabilities of Gemini models to your terminal in an interactive Read-Eval-Print Loop (REPL) environment. Gemini CLI consists of a client-side application (`packages/cli`) that communicates with a local server (`packages/core`), which in turn manages requests to the Gemini API and its AI models. Gemini CLI also contains a variety of tools for tasks such as performing file system operations, running shells, and web fetching, which are managed by `packages/core`.
+agentic-cli brings the capabilities of AI models to your terminal in an interactive Read-Eval-Print Loop (REPL) environment. The system consists of a client-side application (`packages/cli`) that communicates with a local server (`packages/core`), which manages requests to AI models and provides various tools for tasks such as performing file system operations, running shells, and web fetching.
 
 ## Navigating the documentation
 

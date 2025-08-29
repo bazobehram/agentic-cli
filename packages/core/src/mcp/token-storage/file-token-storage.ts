@@ -23,8 +23,8 @@ export class FileTokenStorage extends BaseTokenStorage {
   }
 
   private deriveEncryptionKey(): Buffer {
-    const salt = `${os.hostname()}-${os.userInfo().username}-gemini-cli`;
-    return crypto.scryptSync('gemini-cli-oauth', salt, 32);
+    const salt = `${os.hostname()}-${os.userInfo().username}-agentic-cli`;
+    return crypto.scryptSync('agentic-cli-oauth', salt, 32);
   }
 
   private encrypt(text: string): string {

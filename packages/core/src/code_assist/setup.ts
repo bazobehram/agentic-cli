@@ -17,7 +17,7 @@ import type { OAuth2Client } from 'google-auth-library';
 export class ProjectIdRequiredError extends Error {
   constructor() {
     super(
-      'This account requires setting the GOOGLE_CLOUD_PROJECT env var. See https://goo.gle/gemini-cli-auth-docs#workspace-gca',
+      'This account requires setting the GOOGLE_CLOUD_PROJECT env var. See https://goo.gle/agentic-cli-auth-docs#workspace-gca',
     );
   }
 }

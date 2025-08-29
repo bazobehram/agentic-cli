@@ -13,12 +13,12 @@ import {
   BaseDeclarativeTool,
   BaseToolInvocation,
   Kind,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import type {
   ToolCallConfirmationDetails,
   ToolResult,
   ToolInvocation,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import { expect, vi } from 'vitest';
 
 export const mockOnUserConfirmForToolConfirmation = vi.fn();
@@ -57,7 +57,7 @@ export class MockToolInvocation extends BaseToolInvocation<object, ToolResult> {
   }
 }
 
-// TODO: dedup with gemini-cli, add shouldConfirmExecute() support in core
+// TODO: dedup with agentic-cli, add shouldConfirmExecute() support in core
 export class MockTool extends BaseDeclarativeTool<object, ToolResult> {
   constructor(
     name: string,

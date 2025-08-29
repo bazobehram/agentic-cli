@@ -8,9 +8,9 @@ import type { Mock } from 'vitest';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   MemoryTool,
-  setGeminiMdFilename,
-  getCurrentGeminiMdFilename,
-  getAllGeminiMdFilenames,
+  setAgenticMdFilename,
+  getCurrentAgenticMdFilename,
+  getAllAgenticMdFilenames,
   DEFAULT_CONTEXT_FILENAME,
 } from './memoryTool.js';
 import * as fs from 'node:fs/promises';
@@ -35,7 +35,7 @@ vi.mock('fs', () => ({
 
 vi.mock('os');
 
-const MEMORY_SECTION_HEADER = '## Gemini Added Memories';
+const MEMORY_SECTION_HEADER = '## Agentic Added Memories';
 
 // Define a type for our fsAdapter to ensure consistency
 interface FsAdapter {
@@ -71,31 +71,31 @@ describe('MemoryTool', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
-    // Reset GEMINI_MD_FILENAME to its original value after each test
-    setGeminiMdFilename(DEFAULT_CONTEXT_FILENAME);
+    // Reset AGENTIC_MD_FILENAME to its original value after each test
+    setAgenticMdFilename(DEFAULT_CONTEXT_FILENAME);
   });
 
-  describe('setGeminiMdFilename', () => {
-    it('should update currentGeminiMdFilename when a valid new name is provided', () => {
+  describe('setAgenticMdFilename', () => {
+    it('should update currentAgenticMdFilename when a valid new name is provided', () => {
       const newName = 'CUSTOM_CONTEXT.md';
-      setGeminiMdFilename(newName);
-      expect(getCurrentGeminiMdFilename()).toBe(newName);
+      setAgenticMdFilename(newName);
+      expect(getCurrentAgenticMdFilename()).toBe(newName);
     });
 
-    it('should not update currentGeminiMdFilename if the new name is empty or whitespace', () => {
-      const initialName = getCurrentGeminiMdFilename(); // Get current before trying to change
-      setGeminiMdFilename('  ');
-      expect(getCurrentGeminiMdFilename()).toBe(initialName);
+    it('should not update currentAgenticMdFilename if the new name is empty or whitespace', () => {
+      const initialName = getCurrentAgenticMdFilename(); // Get current before trying to change
+      setAgenticMdFilename('  ');
+      expect(getCurrentAgenticMdFilename()).toBe(initialName);
 
-      setGeminiMdFilename('');
-      expect(getCurrentGeminiMdFilename()).toBe(initialName);
+      setAgenticMdFilename('');
+      expect(getCurrentAgenticMdFilename()).toBe(initialName);
     });
 
     it('should handle an array of filenames', () => {
       const newNames = ['CUSTOM_CONTEXT.md', 'ANOTHER_CONTEXT.md'];
-      setGeminiMdFilename(newNames);
-      expect(getCurrentGeminiMdFilename()).toBe('CUSTOM_CONTEXT.md');
-      expect(getAllGeminiMdFilenames()).toEqual(newNames);
+      setAgenticMdFilename(newNames);
+      expect(getCurrentAgenticMdFilename()).toBe('CUSTOM_CONTEXT.md');
+      expect(getAllAgenticMdFilenames()).toEqual(newNames);
     });
   });
 
@@ -105,7 +105,7 @@ describe('MemoryTool', () => {
     beforeEach(() => {
       testFilePath = path.join(
         os.homedir(),
-        '.gemini',
+        '.agentic-cli',
         DEFAULT_CONTEXT_FILENAME,
       );
     });
@@ -234,11 +234,11 @@ describe('MemoryTool', () => {
       const params = { fact: 'The sky is blue' };
       const invocation = memoryTool.build(params);
       const result = await invocation.execute(mockAbortSignal);
-      // Use getCurrentGeminiMdFilename for the default expectation before any setGeminiMdFilename calls in a test
+      // Use getCurrentAgenticMdFilename for the default expectation before any setAgenticMdFilename calls in a test
       const expectedFilePath = path.join(
         os.homedir(),
-        '.gemini',
-        getCurrentGeminiMdFilename(), // This will be DEFAULT_CONTEXT_FILENAME unless changed by a test
+        '.agentic-cli',
+        getCurrentAgenticMdFilename(), // This will be DEFAULT_CONTEXT_FILENAME unless changed by a test
       );
 
       // For this test, we expect the actual fs methods to be passed
@@ -317,15 +317,15 @@ describe('MemoryTool', () => {
       expect(result).not.toBe(false);
 
       if (result && result.type === 'edit') {
-        const expectedPath = path.join('~', '.gemini', 'GEMINI.md');
+        const expectedPath = path.join('~', '.agentic-cli', 'CONTEXT.md');
         expect(result.title).toBe(`Confirm Memory Save: ${expectedPath}`);
-        expect(result.fileName).toContain(path.join('mock', 'home', '.gemini'));
-        expect(result.fileName).toContain('GEMINI.md');
-        expect(result.fileDiff).toContain('Index: GEMINI.md');
-        expect(result.fileDiff).toContain('+## Gemini Added Memories');
+        expect(result.fileName).toContain(path.join('mock', 'home', '.agentic-cli'));
+        expect(result.fileName).toContain('CONTEXT.md');
+        expect(result.fileDiff).toContain('Index: CONTEXT.md');
+        expect(result.fileDiff).toContain('+## Agentic Added Memories');
         expect(result.fileDiff).toContain('+- Test fact');
         expect(result.originalContent).toBe('');
-        expect(result.newContent).toContain('## Gemini Added Memories');
+        expect(result.newContent).toContain('## Agentic Added Memories');
         expect(result.newContent).toContain('- Test fact');
       }
     });
@@ -334,8 +334,8 @@ describe('MemoryTool', () => {
       const params = { fact: 'Test fact' };
       const memoryFilePath = path.join(
         os.homedir(),
-        '.gemini',
-        getCurrentGeminiMdFilename(),
+        '.agentic-cli',
+        getCurrentAgenticMdFilename(),
       );
 
       const invocation = memoryTool.build(params);
@@ -352,8 +352,8 @@ describe('MemoryTool', () => {
       const params = { fact: 'Test fact' };
       const memoryFilePath = path.join(
         os.homedir(),
-        '.gemini',
-        getCurrentGeminiMdFilename(),
+        '.agentic-cli',
+        getCurrentAgenticMdFilename(),
       );
 
       const invocation = memoryTool.build(params);
@@ -378,8 +378,8 @@ describe('MemoryTool', () => {
       const params = { fact: 'Test fact' };
       const memoryFilePath = path.join(
         os.homedir(),
-        '.gemini',
-        getCurrentGeminiMdFilename(),
+        '.agentic-cli',
+        getCurrentAgenticMdFilename(),
       );
 
       const invocation = memoryTool.build(params);
@@ -403,7 +403,7 @@ describe('MemoryTool', () => {
     it('should handle existing memory file with content', async () => {
       const params = { fact: 'New fact' };
       const existingContent =
-        'Some existing content.\n\n## Gemini Added Memories\n- Old fact\n';
+        'Some existing content.\n\n## Agentic Added Memories\n- Old fact\n';
 
       // Mock fs.readFile to return existing content
       vi.mocked(fs.readFile).mockResolvedValue(existingContent);
@@ -415,9 +415,9 @@ describe('MemoryTool', () => {
       expect(result).not.toBe(false);
 
       if (result && result.type === 'edit') {
-        const expectedPath = path.join('~', '.gemini', 'GEMINI.md');
+        const expectedPath = path.join('~', '.agentic-cli', 'CONTEXT.md');
         expect(result.title).toBe(`Confirm Memory Save: ${expectedPath}`);
-        expect(result.fileDiff).toContain('Index: GEMINI.md');
+        expect(result.fileDiff).toContain('Index: CONTEXT.md');
         expect(result.fileDiff).toContain('+- New fact');
         expect(result.originalContent).toBe(existingContent);
         expect(result.newContent).toContain('- Old fact');

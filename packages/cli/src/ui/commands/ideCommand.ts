@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Config, IdeClient, File } from '@google/gemini-cli-core';
+import type { Config, IdeClient, File } from 'agentic-cli-core';
 import {
   getIdeInstaller,
   IDEConnectionStatus,
   ideContext,
   GEMINI_CLI_COMPANION_EXTENSION_NAME,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import path from 'node:path';
 import type {
   CommandContext,
@@ -126,7 +126,7 @@ export const ideCommand = (config: Config | null): SlashCommand | null => {
         ({
           type: 'message',
           messageType: 'error',
-          content: `IDE integration is not supported in your current environment. To use this feature, run Gemini CLI in one of these supported IDEs: VS Code or VS Code forks.`,
+          content: `IDE integration is not supported in your current environment. To use this feature, run agentic-cli in one of these supported IDEs: VS Code or VS Code forks.`,
         }) as const,
     };
   }

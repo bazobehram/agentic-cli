@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthType } from '@google/gemini-cli-core';
+import { AuthType } from 'agentic-cli-core';
 import { loadEnvironment, loadSettings } from './settings.js';
 
 export function validateAuthMethod(authMethod: string): string | null {
@@ -37,6 +37,12 @@ export function validateAuthMethod(authMethod: string): string | null {
       );
     }
     return null;
+  }
+
+  if (authMethod === AuthType.LOCAL_LLM) {
+    // LOCAL_LLM doesn't require authentication, but we should validate that
+    // the local LLM service (e.g., Ollama) is running
+    return null; // Always allow LOCAL_LLM selection for now
   }
 
   return 'Invalid auth method selected.';

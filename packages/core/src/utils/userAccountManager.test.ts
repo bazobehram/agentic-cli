@@ -26,7 +26,7 @@ describe('UserAccountManager', () => {
 
   beforeEach(() => {
     tempHomeDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'gemini-cli-test-home-'),
+      path.join(os.tmpdir(), 'agentic-cli-test-home-'),
     );
     (os.homedir as Mock).mockReturnValue(tempHomeDir);
     accountsFile = () =>

@@ -6,7 +6,7 @@
 
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
-import { Storage } from '@google/gemini-cli-core';
+import { Storage } from 'agentic-cli-core';
 
 const cleanupFunctions: Array<(() => void) | (() => Promise<void>)> = [];
 

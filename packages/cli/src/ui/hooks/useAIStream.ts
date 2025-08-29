@@ -16,7 +16,7 @@ import type {
   ToolCallRequestInfo,
   EditorType,
   ThoughtSummary,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import {
   GeminiEventType as ServerGeminiEventType,
   getErrorMessage,
@@ -31,7 +31,7 @@ import {
   ConversationFinishedEvent,
   ApprovalMode,
   parseAndFormatApiError,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import { type Part, type PartListUnion, FinishReason } from '@google/genai';
 import type {
   HistoryItem,
@@ -68,10 +68,11 @@ enum StreamProcessingStatus {
 }
 
 /**
- * Manages the Gemini stream, including user input, command processing,
+ * Manages the AI stream, including user input, command processing,
  * API interaction, and tool call lifecycle.
+ * Works with any LLM provider (Gemini, Ollama, etc.).
  */
-export const useGeminiStream = (
+export const useAIStream = (
   geminiClient: GeminiClient,
   history: HistoryItem[],
   addItem: UseHistoryManagerReturn['addItem'],

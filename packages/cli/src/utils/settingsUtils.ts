@@ -239,7 +239,10 @@ export function getDialogSettingsByType(
  */
 export function getDialogSettingKeys(): string[] {
   return Object.values(FLATTENED_SCHEMA)
-    .filter((definition) => definition.showInDialog !== false)
+    .filter((definition) => 
+      definition.showInDialog !== false && 
+      definition.type !== 'object'
+    )
     .map((definition) => definition.key);
 }
 
@@ -414,26 +417,44 @@ export function getDisplayValue(
   modifiedSettings: Set<string>,
   pendingSettings?: Settings,
 ): string {
-  // Prioritize pending changes if user has modified this setting
-  let value: boolean;
-  if (pendingSettings && settingExistsInScope(key, pendingSettings)) {
-    // Show the value from the pending (unsaved) edits when it exists
-    value = getSettingValue(key, pendingSettings, {});
-  } else if (settingExistsInScope(key, settings)) {
-    // Show the value defined at the current scope if present
-    value = getSettingValue(key, settings, {});
-  } else {
-    // Fall back to the schema default when the key is unset in this scope
-    const defaultValue = getDefaultValue(key);
-    value = typeof defaultValue === 'boolean' ? defaultValue : false;
+  const definition = getSettingDefinition(key);
+  if (!definition) {
+    return '[Unknown Setting]';
   }
 
-  const valueString = String(value);
+  // For object-type settings, don't try to render them
+  if (definition.type === 'object') {
+    return '[Object]';
+  }
+
+  // Prioritize pending changes if user has modified this setting
+  let value: unknown;
+  if (pendingSettings && settingExistsInScope(key, pendingSettings)) {
+    // Show the value from the pending (unsaved) edits when it exists
+    const path = key.split('.');
+    value = getNestedValue(pendingSettings as Record<string, unknown>, path);
+  } else if (settingExistsInScope(key, settings)) {
+    // Show the value defined at the current scope if present
+    const path = key.split('.');
+    value = getNestedValue(settings as Record<string, unknown>, path);
+  } else {
+    // Fall back to the schema default when the key is unset in this scope
+    value = getDefaultValue(key);
+  }
+
+  // Handle different value types safely
+  let valueString: string;
+  if (value === null || value === undefined) {
+    valueString = '[Not Set]';
+  } else if (typeof value === 'object') {
+    valueString = '[Object]';
+  } else {
+    valueString = String(value);
+  }
 
   // Check if value is different from default OR if it's in modified settings OR if there are pending changes
   const defaultValue = getDefaultValue(key);
-  const isChangedFromDefault =
-    typeof defaultValue === 'boolean' ? value !== defaultValue : value === true;
+  const isChangedFromDefault = value !== defaultValue;
   const isInModifiedSettings = modifiedSettings.has(key);
 
   // Mark as modified if setting exists in current scope OR is in modified settings

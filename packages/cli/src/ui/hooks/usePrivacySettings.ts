@@ -5,12 +5,12 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import type { Config } from '@google/gemini-cli-core';
+import type { Config } from 'agentic-cli-core';
 import {
   CodeAssistServer,
   UserTierId,
   LoggingContentGenerator,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 
 export interface PrivacyState {
   isLoading: boolean;

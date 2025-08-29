@@ -72,7 +72,7 @@ function getTimestampFromFunctionId(fcnId: string): number {
 }
 
 /**
- * Will look through the gemini client history and determine when the most recent
+ * Will look through the agentic-client history and determine when the most recent
  * edit to a target file occurred. If no edit happened, it will return -1
  * @param filePath the path to the file
  * @param client the geminiClient, so that we can get the history

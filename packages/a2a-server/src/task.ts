@@ -14,7 +14,7 @@ import {
   MCPServerStatus,
   isNodeError,
   parseAndFormatApiError,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import type {
   ToolConfirmationPayload,
   CompletedToolCall,
@@ -25,7 +25,7 @@ import type {
   ToolCallConfirmationDetails,
   Config,
   UserTierId,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import type { RequestContext } from '@a2a-js/sdk/server';
 import { type ExecutionEventBus } from '@a2a-js/sdk/server';
 import type {
@@ -90,7 +90,7 @@ export class Task {
     this._resetToolCompletionPromise();
     this.config.setFlashFallbackHandler(
       async (currentModel: string, fallbackModel: string): Promise<boolean> => {
-        config.setModel(fallbackModel); // gemini-cli-core sets to DEFAULT_GEMINI_FLASH_MODEL
+        config.setModel(fallbackModel); // agentic-cli-core sets to DEFAULT_GEMINI_FLASH_MODEL
         // Switch model for future use but return false to stop current retry
         return false;
       },
@@ -108,7 +108,7 @@ export class Task {
 
   // Note: `getAllMCPServerStatuses` retrieves the status of all MCP servers for the entire
   // process. This is not scoped to the individual task but reflects the global connection
-  // state managed within the @gemini-cli/core module.
+  // state managed within the @agentic-cli/core module.
   async getMetadata(): Promise<TaskMetadata> {
     const toolRegistry = await this.config.getToolRegistry();
     const mcpServers = this.config.getMcpServers() || {};

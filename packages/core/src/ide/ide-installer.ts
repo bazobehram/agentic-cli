@@ -119,7 +119,7 @@ class VsCodeInstaller implements IdeInstaller {
       };
     }
 
-    const command = `"${commandPath}" --install-extension google.gemini-cli-vscode-ide-companion --force`;
+    const command = `"${commandPath}" --install-extension google.agentic-cli-vscode-ide-companion --force`;
     try {
       child_process.execSync(command, { stdio: 'pipe' });
       return {

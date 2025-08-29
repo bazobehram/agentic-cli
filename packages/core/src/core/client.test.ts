@@ -162,7 +162,7 @@ describe('findIndexAfterFraction', () => {
   });
 });
 
-describe('Gemini Client (client.ts)', () => {
+describe('agentic-client (client.ts)', () => {
   let client: GeminiClient;
   beforeEach(async () => {
     vi.resetAllMocks();

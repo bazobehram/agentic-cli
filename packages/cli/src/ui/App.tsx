@@ -5,6 +5,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import { safeRenderValue } from './utils/safeRender.js';
 import {
   Box,
   type DOMElement,
@@ -22,7 +23,7 @@ import {
   type HistoryItemWithoutId,
 } from './types.js';
 import { useTerminalSize } from './hooks/useTerminalSize.js';
-import { useGeminiStream } from './hooks/useGeminiStream.js';
+import { useAIStream } from './hooks/useAIStream.js';
 import { useLoadingIndicator } from './hooks/useLoadingIndicator.js';
 import { useThemeCommand } from './hooks/useThemeCommand.js';
 import { useAuthCommand } from './hooks/useAuthCommand.js';
@@ -57,10 +58,10 @@ import { HistoryItemDisplay } from './components/HistoryItemDisplay.js';
 import { ContextSummaryDisplay } from './components/ContextSummaryDisplay.js';
 import { useHistory } from './hooks/useHistoryManager.js';
 import process from 'node:process';
-import type { EditorType, Config, IdeContext } from '@google/gemini-cli-core';
+import type { EditorType, Config, IdeContext } from 'agentic-cli-core';
 import {
   ApprovalMode,
-  getAllGeminiMdFilenames,
+  getAllAgenticMdFilenames,
   isEditorAvailable,
   getErrorMessage,
   AuthType,
@@ -70,7 +71,7 @@ import {
   isProQuotaExceededError,
   isGenericQuotaExceededError,
   UserTierId,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import type { IdeIntegrationNudgeResult } from './IdeIntegrationNudge.js';
 import { IdeIntegrationNudge } from './IdeIntegrationNudge.js';
 import { validateAuthMethod } from '../config/auth.js';
@@ -345,7 +346,7 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
     addItem(
       {
         type: MessageType.INFO,
-        text: 'Refreshing hierarchical memory (GEMINI.md or other context files)...',
+        text: 'Refreshing hierarchical memory (CONTEXT.md or other context files)...',
       },
       Date.now(),
     );
@@ -434,8 +435,8 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
           } else {
             message = `⚡ You have reached your daily ${currentModel} quota limit.
 ⚡ Automatically switching from ${currentModel} to ${fallbackModel} for the remainder of this session.
-⚡ To increase your limits, upgrade to a Gemini Code Assist Standard or Enterprise plan with higher limits at https://goo.gle/set-up-gemini-code-assist
-⚡ Or you can utilize a Gemini API Key. See: https://goo.gle/gemini-cli-docs-auth#gemini-api-key
+⚡ To increase your limits, upgrade to a Code Assist Standard or Enterprise plan with higher limits at https://goo.gle/set-up-gemini-code-assist
+⚡ Or you can utilize an API Key. See: https://goo.gle/agentic-cli-docs-auth#gemini-api-key
 ⚡ You can switch authentication methods by typing /auth`;
           }
         } else if (error && isGenericQuotaExceededError(error)) {
@@ -446,8 +447,8 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
           } else {
             message = `⚡ You have reached your daily quota limit.
 ⚡ Automatically switching from ${currentModel} to ${fallbackModel} for the remainder of this session.
-⚡ To increase your limits, upgrade to a Gemini Code Assist Standard or Enterprise plan with higher limits at https://goo.gle/set-up-gemini-code-assist
-⚡ Or you can utilize a Gemini API Key. See: https://goo.gle/gemini-cli-docs-auth#gemini-api-key
+⚡ To increase your limits, upgrade to a Code Assist Standard or Enterprise plan with higher limits at https://goo.gle/set-up-gemini-code-assist
+⚡ Or you can utilize an API Key. See: https://goo.gle/agentic-cli-docs-auth#gemini-api-key
 ⚡ You can switch authentication methods by typing /auth`;
           }
         } else {
@@ -460,8 +461,8 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
             // Default fallback message for other cases (like consecutive 429s)
             message = `⚡ Automatically switching from ${currentModel} to ${fallbackModel} for faster responses for the remainder of this session.
 ⚡ Possible reasons for this are that you have received multiple consecutive capacity errors or you have reached your daily ${currentModel} quota limit
-⚡ To increase your limits, upgrade to a Gemini Code Assist Standard or Enterprise plan with higher limits at https://goo.gle/set-up-gemini-code-assist
-⚡ Or you can utilize a Gemini API Key. See: https://goo.gle/gemini-cli-docs-auth#gemini-api-key
+⚡ To increase your limits, upgrade to a Code Assist Standard or Enterprise plan with higher limits at https://goo.gle/set-up-gemini-code-assist
+⚡ Or you can utilize an API Key. See: https://goo.gle/agentic-cli-docs-auth#gemini-api-key
 ⚡ You can switch authentication methods by typing /auth`;
           }
         }
@@ -586,7 +587,7 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
     pendingHistoryItems: pendingGeminiHistoryItems,
     thought,
     cancelOngoingRequest,
-  } = useGeminiStream(
+  } = useAIStream(
     config.getGeminiClient(),
     history,
     addItem,
@@ -895,7 +896,7 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
     if (fromSettings) {
       return Array.isArray(fromSettings) ? fromSettings : [fromSettings];
     }
-    return getAllGeminiMdFilenames();
+    return getAllAgenticMdFilenames();
   }, [settings.merged.context?.fileName]);
 
   const initialPrompt = useMemo(() => config.getQuestion(), [config]);
@@ -1053,7 +1054,14 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
             <ShellConfirmationDialog request={shellConfirmationRequest} />
           ) : confirmationRequest ? (
             <Box flexDirection="column">
-              {confirmationRequest.prompt}
+              {(() => {
+                // Debug logging to catch the exact object being rendered
+                if (typeof confirmationRequest.prompt === 'object' && confirmationRequest.prompt !== null) {
+                  console.log('[DEBUG] ConfirmationRequest prompt object:', JSON.stringify(confirmationRequest.prompt, null, 2));
+                  console.log('[DEBUG] ConfirmationRequest prompt object keys:', Object.keys(confirmationRequest.prompt));
+                }
+                return safeRenderValue(confirmationRequest.prompt);
+              })()}
               <Box paddingY={1}>
                 <RadioButtonSelect
                   isFocused={!!confirmationRequest}

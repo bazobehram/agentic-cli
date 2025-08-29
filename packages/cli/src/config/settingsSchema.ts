@@ -10,7 +10,7 @@ import type {
   TelemetrySettings,
   AuthType,
   ChatCompressionSettings,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import type { CustomTheme } from '../ui/themes/theme.js';
 
 export interface SettingDefinition {
@@ -328,7 +328,7 @@ export const SETTINGS_SCHEMA = {
         category: 'Model',
         requiresRestart: false,
         default: undefined as string | undefined,
-        description: 'The Gemini model to use for conversations.',
+        description: 'The AI model to use for conversations.',
         showInDialog: false,
       },
       maxSessionTurns: {
@@ -369,6 +369,53 @@ export const SETTINGS_SCHEMA = {
         default: false,
         description: 'Skip the next speaker check.',
         showInDialog: true,
+      },
+      selection: {
+        type: 'object',
+        label: 'Model Selection',
+        category: 'Model',
+        requiresRestart: false,
+        default: {},
+        description: 'Settings for intelligent model selection.',
+        showInDialog: false,
+        properties: {
+          mode: {
+            type: 'string',
+            label: 'Selection Mode',
+            category: 'Model',
+            requiresRestart: false,
+            default: 'auto' as 'auto' | 'manual' | undefined,
+            description: 'Whether to automatically select the best model for each task or use a fixed model.',
+            showInDialog: true,
+          },
+          preferredModel: {
+            type: 'string',
+            label: 'Preferred Model',
+            category: 'Model',
+            requiresRestart: false,
+            default: undefined as string | undefined,
+            description: 'The preferred model to use when in manual mode.',
+            showInDialog: true,
+          },
+          allowFallback: {
+            type: 'boolean',
+            label: 'Allow Model Fallback',
+            category: 'Model',
+            requiresRestart: false,
+            default: true,
+            description: 'Allow fallback to alternative models if the preferred model is unavailable.',
+            showInDialog: true,
+          },
+          showRecommendations: {
+            type: 'boolean',
+            label: 'Show Model Recommendations',
+            category: 'Model',
+            requiresRestart: false,
+            default: true,
+            description: 'Show model recommendations and reasoning in the UI.',
+            showInDialog: true,
+          },
+        },
       },
     },
   },
@@ -452,7 +499,7 @@ export const SETTINGS_SCHEMA = {
             category: 'Context',
             requiresRestart: true,
             default: true,
-            description: 'Respect .geminiignore files when searching',
+            description: 'Respect .agenticignore files when searching',
             showInDialog: true,
           },
           enableRecursiveFileSearch: {
@@ -657,7 +704,7 @@ export const SETTINGS_SCHEMA = {
             label: 'Selected Auth Type',
             category: 'Security',
             requiresRestart: true,
-            default: undefined as AuthType | undefined,
+            default: 'local-llm' as AuthType | undefined,
             description: 'The currently selected authentication type.',
             showInDialog: false,
           },

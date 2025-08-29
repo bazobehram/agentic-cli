@@ -1,10 +1,10 @@
 {
-  "name": "@google/gemini-cli-core",
+  "name": "agentic-cli-core",
   "version": "0.2.2",
-  "description": "Gemini CLI Core",
+  "description": "agentic-cli Core - Backend runtime for agentic-cli",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/google-gemini/gemini-cli.git"
+    "url": "git+https://github.com/google-gemini/agentic-cli.git"
   },
   "type": "module",
   "main": "dist/index.js",
@@ -69,7 +69,7 @@
     "node-pty": "^1.0.0"
   },
   "devDependencies": {
-    "@google/gemini-cli-test-utils": "file:../test-utils",
+    "agentic-cli-test-utils": "file:../test-utils",
     "@types/diff": "^7.0.2",
     "@types/dotenv": "^6.1.1",
     "@types/fast-levenshtein": "^0.0.4",

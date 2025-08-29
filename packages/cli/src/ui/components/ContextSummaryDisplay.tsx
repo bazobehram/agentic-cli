@@ -7,7 +7,7 @@
 import type React from 'react';
 import { Box, Text } from 'ink';
 import { Colors } from '../colors.js';
-import { type IdeContext, type MCPServerConfig } from '@google/gemini-cli-core';
+import { type IdeContext, type MCPServerConfig } from 'agentic-cli-core';
 import { useTerminalSize } from '../hooks/useTerminalSize.js';
 import { isNarrowWidth } from '../utils/isNarrowWidth.js';
 
@@ -52,12 +52,12 @@ export const ContextSummaryDisplay: React.FC<ContextSummaryDisplayProps> = ({
     } (ctrl+g to view)`;
   })();
 
-  const geminiMdText = (() => {
+  const contextFilesText = (() => {
     if (geminiMdFileCount === 0) {
       return '';
     }
-    const allNamesTheSame = new Set(contextFileNames).size < 2;
-    const name = allNamesTheSame ? contextFileNames[0] : 'context';
+    // Always show as "context" files for consistency
+    const name = 'context';
     return `${geminiMdFileCount} ${name} file${
       geminiMdFileCount > 1 ? 's' : ''
     }`;
@@ -94,7 +94,7 @@ export const ContextSummaryDisplay: React.FC<ContextSummaryDisplayProps> = ({
     return text;
   })();
 
-  const summaryParts = [openFilesText, geminiMdText, mcpText].filter(Boolean);
+  const summaryParts = [openFilesText, contextFilesText, mcpText].filter(Boolean);
 
   if (isNarrow) {
     return (

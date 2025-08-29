@@ -15,11 +15,11 @@ import {
 } from 'vitest';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { ShellTool, EditTool, WriteFileTool } from '@google/gemini-cli-core';
+import { ShellTool, EditTool, WriteFileTool } from 'agentic-cli-core';
 import { loadCliConfig, parseArguments, type CliArgs } from './config.js';
 import type { Settings } from './settings.js';
 import type { Extension } from './extension.js';
-import * as ServerConfig from '@google/gemini-cli-core';
+import * as ServerConfig from 'agentic-cli-core';
 import { isWorkspaceTrusted } from './trustedFolders.js';
 
 vi.mock('./trustedFolders.js', () => ({
@@ -76,9 +76,9 @@ vi.mock('read-package-up', () => ({
   ),
 }));
 
-vi.mock('@google/gemini-cli-core', async () => {
+vi.mock('agentic-cli-core', async () => {
   const actualServer = await vi.importActual<typeof ServerConfig>(
-    '@google/gemini-cli-core',
+    'agentic-cli-core',
   );
   return {
     ...actualServer,
@@ -1443,7 +1443,7 @@ describe('loadCliConfig model selection', () => {
     expect(config.getModel()).toBe('gemini-9001-ultra');
   });
 
-  it('uses the default gemini model if nothing is set', async () => {
+  it('uses the default Ollama model if nothing is set', async () => {
     process.argv = ['node', 'script.js']; // No model set.
     const argv = await parseArguments({} as Settings);
     const config = await loadCliConfig(
@@ -1455,7 +1455,7 @@ describe('loadCliConfig model selection', () => {
       argv,
     );
 
-    expect(config.getModel()).toBe('gemini-2.5-pro');
+    expect(config.getModel()).toBe('llama3.1:latest');
   });
 
   it('always prefers model from argvs', async () => {

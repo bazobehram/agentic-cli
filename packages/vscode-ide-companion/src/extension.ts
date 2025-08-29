@@ -18,7 +18,7 @@ let logger: vscode.OutputChannel;
 let log: (message: string) => void = () => {};
 
 export async function activate(context: vscode.ExtensionContext) {
-  logger = vscode.window.createOutputChannel('Gemini CLI IDE Companion');
+  logger = vscode.window.createOutputChannel('agentic-cli IDE Companion');
   log = createLogger(context, logger);
   log('Extension activated');
 
@@ -65,7 +65,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   if (!context.globalState.get(INFO_MESSAGE_SHOWN_KEY)) {
     void vscode.window.showInformationMessage(
-      'Gemini CLI Companion extension successfully installed.',
+      'agentic-cli Companion extension successfully installed.',
     );
     context.globalState.update(INFO_MESSAGE_SHOWN_KEY, true);
   }
@@ -74,11 +74,11 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidChangeWorkspaceFolders(() => {
       ideServer.updateWorkspacePath();
     }),
-    vscode.commands.registerCommand('gemini-cli.runGeminiCLI', async () => {
+    vscode.commands.registerCommand('agentic-cli.runGeminiCLI', async () => {
       const workspaceFolders = vscode.workspace.workspaceFolders;
       if (!workspaceFolders || workspaceFolders.length === 0) {
         vscode.window.showInformationMessage(
-          'No folder open. Please open a folder to run Gemini CLI.',
+          'No folder open. Please open a folder to run agentic-cli.',
         );
         return;
       }
@@ -88,21 +88,21 @@ export async function activate(context: vscode.ExtensionContext) {
         selectedFolder = workspaceFolders[0];
       } else {
         selectedFolder = await vscode.window.showWorkspaceFolderPick({
-          placeHolder: 'Select a folder to run Gemini CLI in',
+          placeHolder: 'Select a folder to run agentic-cli in',
         });
       }
 
       if (selectedFolder) {
         const geminiCmd = 'gemini';
         const terminal = vscode.window.createTerminal({
-          name: `Gemini CLI (${selectedFolder.name})`,
+          name: `agentic-cli (${selectedFolder.name})`,
           cwd: selectedFolder.uri.fsPath,
         });
         terminal.show();
         terminal.sendText(geminiCmd);
       }
     }),
-    vscode.commands.registerCommand('gemini-cli.showNotices', async () => {
+    vscode.commands.registerCommand('agentic-cli.showNotices', async () => {
       const noticePath = vscode.Uri.joinPath(
         context.extensionUri,
         'NOTICES.txt',

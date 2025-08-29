@@ -34,7 +34,8 @@ import type {
   ContentGenerator,
   ContentGeneratorConfig,
 } from './contentGenerator.js';
-import { AuthType, createContentGenerator } from './contentGenerator.js';
+import { createContentGenerator } from './contentGenerator.js';
+import { AuthType } from './contentGenerator.js';
 import { ProxyAgent, setGlobalDispatcher } from 'undici';
 import { DEFAULT_GEMINI_FLASH_MODEL } from '../config/models.js';
 import { LoopDetectionService } from '../services/loopDetectionService.js';
@@ -213,6 +214,65 @@ export class GeminiClient {
     this.chat = await this.startChat();
   }
 
+  /**
+   * Updates the system prompt with the current model identity
+   * This should be called when the model is switched to ensure
+   * the AI identifies itself with the correct model name
+   */
+  updateSystemPrompt(): void {
+    if (!this.chat) {
+      return;
+    }
+
+    const userMemory = this.config.getUserMemory();
+    const currentModel = this.config.getModel();
+    const systemInstruction = getCoreSystemPrompt(userMemory, currentModel);
+    this.getChat().setSystemInstruction(systemInstruction);
+  }
+
+  /**
+   * Updates the model and recreates the content generator if necessary
+   * This is required for local LLMs to actually switch to the new model
+   */
+  async updateModel(newModel: string): Promise<void> {
+    const currentContentGeneratorConfig = this.config.getContentGeneratorConfig();
+    const authType = currentContentGeneratorConfig.authType;
+    
+    // Update model in config first
+    this.config.setModel(newModel);
+    
+    // For local LLMs, we need to recreate the content generator with the new model
+    if (authType === AuthType.LOCAL_LLM) {
+      // Save current chat history
+      const currentHistory = this.getHistory();
+      
+      // Create new content generator config with updated model
+      const newContentGeneratorConfig = {
+        ...currentContentGeneratorConfig,
+        model: newModel
+      };
+      
+      // Recreate content generator with new model
+      this.contentGenerator = await createContentGenerator(
+        newContentGeneratorConfig,
+        this.config,
+        this.config.getSessionId(),
+      );
+      
+      // Recreate chat with new content generator
+      this.chat = await this.startChat();
+      
+      // Restore chat history (but not the environment context)
+      if (currentHistory.length > 2) { // Skip environment context messages
+        const userHistory = currentHistory.slice(2); // Skip first two messages (env context)
+        this.setHistory(userHistory);
+      }
+    } else {
+      // For other providers (Google AI), just update the system prompt
+      this.updateSystemPrompt();
+    }
+  }
+
   async addDirectoryContext(): Promise<void> {
     if (!this.chat) {
       return;
@@ -244,7 +304,8 @@ export class GeminiClient {
     ];
     try {
       const userMemory = this.config.getUserMemory();
-      const systemInstruction = getCoreSystemPrompt(userMemory);
+      const currentModel = this.config.getModel();
+      const systemInstruction = getCoreSystemPrompt(userMemory, currentModel);
       const generateContentConfigWithThinking = isThinkingSupported(
         this.config.getModel(),
       )
@@ -579,7 +640,7 @@ export class GeminiClient {
       model || this.config.getModel() || DEFAULT_GEMINI_FLASH_MODEL;
     try {
       const userMemory = this.config.getUserMemory();
-      const systemInstruction = getCoreSystemPrompt(userMemory);
+      const systemInstruction = getCoreSystemPrompt(userMemory, modelToUse);
       const requestConfig = {
         abortSignal,
         ...this.generateContentConfig,
@@ -690,7 +751,7 @@ export class GeminiClient {
 
     try {
       const userMemory = this.config.getUserMemory();
-      const systemInstruction = getCoreSystemPrompt(userMemory);
+      const systemInstruction = getCoreSystemPrompt(userMemory, modelToUse);
 
       const requestConfig: GenerateContentConfig = {
         abortSignal,

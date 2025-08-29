@@ -6,14 +6,12 @@
 .gemini/
 !gemini/config.yaml
 
-# Note: .gemini-clipboard/ is NOT in gitignore so Gemini can access pasted images
-
-# Dependency directory
-node_modules
-bower_components
+# Dependency directories
+node_modules/
+bower_components/
 
 # Editors
-.idea
+.idea/
 *.iml
 
 # OS metadata
@@ -24,12 +22,12 @@ Thumbs.db
 *.tsbuildinfo
 
 # Ignore built ts files
-dist
+dist/
 
 # Docker folder to help skip auth refreshes
-.docker
+.docker/
 
-bundle
+bundle/
 
 # Test report files
 junit.xml
@@ -40,6 +38,10 @@ packages/cli/src/generated/
 packages/core/src/generated/
 .integration-tests/
 packages/vscode-ide-companion/*.vsix
+
+# Packages directory
+packages/*/dist/
+packages/*/coverage/
 
 # GHA credentials
 gha-creds-*.json

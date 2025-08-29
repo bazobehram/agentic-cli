@@ -1,4 +1,4 @@
-name: 'Gemini CLI CI'
+name: 'agentic-cli CI'
 
 on:
   push:

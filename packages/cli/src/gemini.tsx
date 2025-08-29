@@ -25,7 +25,7 @@ import { runNonInteractive } from './nonInteractiveCli.js';
 import { loadExtensions } from './config/extension.js';
 import { cleanupCheckpoints, registerCleanup } from './utils/cleanup.js';
 import { getCliVersion } from './utils/version.js';
-import type { Config } from '@google/gemini-cli-core';
+import type { Config } from 'agentic-cli-core';
 import {
   sessionId,
   logUserPrompt,
@@ -35,7 +35,7 @@ import {
   IdeConnectionEvent,
   IdeConnectionType,
   FatalConfigError,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import { validateAuthMethod } from './config/auth.js';
 import { setMaxSizedBoxDebugging } from './ui/components/shared/MaxSizedBox.js';
 import { validateNonInteractiveAuth } from './validateNonInterActiveAuth.js';
@@ -77,7 +77,7 @@ function getNodeMemoryArgs(config: Config): string[] {
     );
   }
 
-  if (process.env['GEMINI_CLI_NO_RELAUNCH']) {
+  if (process.env['AGENTIC_CLI_NO_RELAUNCH']) {
     return [];
   }
 
@@ -95,7 +95,7 @@ function getNodeMemoryArgs(config: Config): string[] {
 
 async function relaunchWithAdditionalArgs(additionalArgs: string[]) {
   const nodeArgs = [...additionalArgs, ...process.argv.slice(1)];
-  const newEnv = { ...process.env, GEMINI_CLI_NO_RELAUNCH: 'true' };
+  const newEnv = { ...process.env, AGENTIC_CLI_NO_RELAUNCH: 'true' };
 
   const child = spawn(process.execPath, nodeArgs, {
     stdio: 'inherit',
@@ -357,7 +357,7 @@ export async function main() {
   }
   if (!input) {
     console.error(
-      `No input provided via stdin. Input can be provided by piping data into gemini or using the --prompt option.`,
+      `No input provided via stdin. Input can be provided by piping data into agentic-cli or using the --prompt option.`,
     );
     process.exit(1);
   }
@@ -389,7 +389,7 @@ export async function main() {
 function setWindowTitle(title: string, settings: LoadedSettings) {
   if (!settings.merged.ui?.hideWindowTitle) {
     const windowTitle = (
-      process.env['CLI_TITLE'] || `Gemini - ${title}`
+      process.env['CLI_TITLE'] || `agentic-cli - ${title}`
     ).replace(
       // eslint-disable-next-line no-control-regex
       /[\x00-\x1F\x7F]/g,

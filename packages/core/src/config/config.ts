@@ -23,7 +23,7 @@ import { ShellTool } from '../tools/shell.js';
 import { WriteFileTool } from '../tools/write-file.js';
 import { WebFetchTool } from '../tools/web-fetch.js';
 import { ReadManyFilesTool } from '../tools/read-many-files.js';
-import { MemoryTool, setGeminiMdFilename } from '../tools/memoryTool.js';
+import { MemoryTool, setAgenticMdFilename } from '../tools/memoryTool.js';
 import { WebSearchTool } from '../tools/web-search.js';
 import { GeminiClient } from '../core/client.js';
 import { FileDiscoveryService } from '../services/fileDiscoveryService.js';
@@ -249,7 +249,7 @@ export class Config {
   private readonly proxy: string | undefined;
   private readonly cwd: string;
   private readonly bugCommand: BugCommandSettings | undefined;
-  private readonly model: string;
+  private model: string;
   private readonly extensionContextFilePaths: string[];
   private readonly noBrowser: boolean;
   private readonly folderTrustFeature: boolean;
@@ -331,7 +331,8 @@ export class Config {
     this.cwd = params.cwd ?? process.cwd();
     this.fileDiscoveryService = params.fileDiscoveryService ?? null;
     this.bugCommand = params.bugCommand;
-    this.model = params.model;
+    // Ensure model is always a string, not an object
+    this.model = typeof params.model === 'string' ? params.model : DEFAULT_GEMINI_FLASH_MODEL;
     this.extensionContextFilePaths = params.extensionContextFilePaths ?? [];
     this.maxSessionTurns = params.maxSessionTurns ?? -1;
     this.experimentalZedIntegration =
@@ -351,14 +352,14 @@ export class Config {
     this.trustedFolder = params.trustedFolder;
     this.useRipgrep = params.useRipgrep ?? false;
     this.shouldUseNodePtyShell = params.shouldUseNodePtyShell ?? false;
-    this.skipNextSpeakerCheck = params.skipNextSpeakerCheck ?? false;
+    this.skipNextSpeakerCheck = params.skipNextSpeakerCheck ?? true;
     this.extensionManagement = params.extensionManagement ?? false;
     this.storage = new Storage(this.targetDir);
     this.enablePromptCompletion = params.enablePromptCompletion ?? false;
     this.fileExclusions = new FileExclusions(this);
 
     if (params.contextFileName) {
-      setGeminiMdFilename(params.contextFileName);
+      setAgenticMdFilename(params.contextFileName);
     }
 
     if (this.telemetrySettings.enabled) {
@@ -436,10 +437,19 @@ export class Config {
   }
 
   getModel(): string {
-    return this.contentGeneratorConfig?.model || this.model;
+    // Prioritize the base model to avoid circular dependency during config creation
+    return this.model || this.contentGeneratorConfig?.model || DEFAULT_GEMINI_FLASH_MODEL;
+  }
+
+  getBaseModel(): string {
+    // Return base model directly without checking contentGeneratorConfig to avoid circular dependency
+    return this.model || DEFAULT_GEMINI_FLASH_MODEL;
   }
 
   setModel(newModel: string): void {
+    // Update both the base model and the content generator config model
+    // to ensure consistency across getModel() calls
+    this.model = newModel;
     if (this.contentGeneratorConfig) {
       this.contentGeneratorConfig.model = newModel;
     }

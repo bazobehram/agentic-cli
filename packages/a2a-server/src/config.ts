@@ -9,7 +9,7 @@ import * as path from 'node:path';
 import { homedir } from 'node:os';
 import * as dotenv from 'dotenv';
 
-import type { TelemetryTarget } from '@google/gemini-cli-core';
+import type { TelemetryTarget } from 'agentic-cli-core';
 import {
   AuthType,
   Config,
@@ -17,10 +17,10 @@ import {
   FileDiscoveryService,
   ApprovalMode,
   loadServerHierarchicalMemory,
-  GEMINI_CONFIG_DIR,
+  AGENTIC_CONFIG_DIR,
   DEFAULT_GEMINI_EMBEDDING_MODEL,
   DEFAULT_GEMINI_MODEL,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 
 import { logger } from './logger.js';
 import type { Settings } from './settings.js';
@@ -172,10 +172,10 @@ export function loadEnvironment(): void {
 function findEnvFile(startDir: string): string | null {
   let currentDir = path.resolve(startDir);
   while (true) {
-    // prefer gemini-specific .env under GEMINI_DIR
-    const geminiEnvPath = path.join(currentDir, GEMINI_CONFIG_DIR, '.env');
-    if (fs.existsSync(geminiEnvPath)) {
-      return geminiEnvPath;
+    // prefer agentic-specific .env under AGENTIC_CONFIG_DIR
+    const agenticEnvPath = path.join(currentDir, AGENTIC_CONFIG_DIR, '.env');
+    if (fs.existsSync(agenticEnvPath)) {
+      return agenticEnvPath;
     }
     const envPath = path.join(currentDir, '.env');
     if (fs.existsSync(envPath)) {
@@ -183,14 +183,14 @@ function findEnvFile(startDir: string): string | null {
     }
     const parentDir = path.dirname(currentDir);
     if (parentDir === currentDir || !parentDir) {
-      // check .env under home as fallback, again preferring gemini-specific .env
-      const homeGeminiEnvPath = path.join(
+      // check .env under home as fallback, again preferring agentic-specific .env
+      const homeAgenticEnvPath = path.join(
         process.cwd(),
-        GEMINI_CONFIG_DIR,
+        AGENTIC_CONFIG_DIR,
         '.env',
       );
-      if (fs.existsSync(homeGeminiEnvPath)) {
-        return homeGeminiEnvPath;
+      if (fs.existsSync(homeAgenticEnvPath)) {
+        return homeAgenticEnvPath;
       }
       const homeEnvPath = path.join(homedir(), '.env');
       if (fs.existsSync(homeEnvPath)) {

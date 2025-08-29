@@ -1,5 +1,5 @@
 {
-  "name": "@google/gemini-cli",
+  "name": "agentic-cli",
   "version": "0.2.2",
   "engines": {
     "node": ">=20.0.0"
@@ -11,14 +11,14 @@
   "private": "true",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/google-gemini/gemini-cli.git"
+    "url": "git+https://github.com/bazobehram/agentic-cli.git"
   },
   "config": {
-    "sandboxImageUri": "us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:0.2.2"
+    "sandboxImageUri": "us-docker.pkg.dev/gemini-code-dev/agentic-cli/sandbox:0.2.2"
   },
   "scripts": {
     "start": "node scripts/start.js",
-    "start:a2a-server": "CODER_AGENT_PORT=41242 npm run start --workspace @google/gemini-cli-a2a-server",
+    "start:a2a-server": "CODER_AGENT_PORT=41242 npm run start --workspace agentic-cli-a2a-server",
     "debug": "cross-env DEBUG=1 node --inspect-brk scripts/start.js",
     "auth:npm": "npx google-artifactregistry-auth",
     "auth:docker": "gcloud auth configure-docker us-west1-docker.pkg.dev",
@@ -52,7 +52,7 @@
     "clean": "node scripts/clean.js"
   },
   "bin": {
-    "gemini": "bundle/gemini.js"
+    "agentic-cli": "bundle/agentic-cli.js"
   },
   "files": [
     "bundle/",

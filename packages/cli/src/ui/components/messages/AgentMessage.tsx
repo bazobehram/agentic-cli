@@ -10,14 +10,14 @@ import { MarkdownDisplay } from '../../utils/MarkdownDisplay.js';
 import { Colors } from '../../colors.js';
 import { SCREEN_READER_MODEL_PREFIX } from '../../constants.js';
 
-interface GeminiMessageProps {
+interface AgentMessageProps {
   text: string;
   isPending: boolean;
   availableTerminalHeight?: number;
   terminalWidth: number;
 }
 
-export const GeminiMessage: React.FC<GeminiMessageProps> = ({
+export const AgentMessage: React.FC<AgentMessageProps> = ({
   text,
   isPending,
   availableTerminalHeight,

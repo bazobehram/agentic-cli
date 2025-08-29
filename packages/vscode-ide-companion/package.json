@@ -1,13 +1,13 @@
 {
-  "name": "gemini-cli-vscode-ide-companion",
-  "displayName": "Gemini CLI Companion",
-  "description": "Enable Gemini CLI with direct access to your IDE workspace.",
+  "name": "agentic-cli-vscode-ide-companion",
+  "displayName": "agentic-cli Companion",
+  "description": "Enable agentic-cli with direct access to your IDE workspace.",
   "version": "0.2.2",
   "publisher": "google",
   "icon": "assets/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/google-gemini/gemini-cli.git",
+    "url": "https://github.com/google-gemini/agentic-cli.git",
     "directory": "packages/vscode-ide-companion"
   },
   "engines": {
@@ -19,10 +19,10 @@
     "AI"
   ],
   "keywords": [
-    "gemini-cli",
-    "gemini cli",
+    "agentic-cli",
+    "agentic cli",
+    "ai agent",
     "gemini",
-    "gemini code",
     "cli",
     "ide integration",
     "ide companion"
@@ -39,21 +39,21 @@
     "commands": [
       {
         "command": "gemini.diff.accept",
-        "title": "Gemini CLI: Accept Diff",
+        "title": "agentic-cli: Accept Diff",
         "icon": "$(check)"
       },
       {
         "command": "gemini.diff.cancel",
-        "title": "Gemini CLI: Close Diff Editor",
+        "title": "agentic-cli: Close Diff Editor",
         "icon": "$(close)"
       },
       {
-        "command": "gemini-cli.runGeminiCLI",
-        "title": "Gemini CLI: Run"
+        "command": "agentic-cli.runGeminiCLI",
+        "title": "agentic-cli: Run"
       },
       {
-        "command": "gemini-cli.showNotices",
-        "title": "Gemini CLI: View Third-Party Notices"
+        "command": "agentic-cli.showNotices",
+        "title": "agentic-cli: View Third-Party Notices"
       }
     ],
     "menus": {

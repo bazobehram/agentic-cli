@@ -11,7 +11,7 @@ import { Colors } from '../colors.js';
 import { RadioButtonSelect } from './shared/RadioButtonSelect.js';
 import type { LoadedSettings } from '../../config/settings.js';
 import { SettingScope } from '../../config/settings.js';
-import { AuthType } from '@google/gemini-cli-core';
+import { AuthType } from 'agentic-cli-core';
 import { validateAuthMethod } from '../../config/auth.js';
 import { useKeypress } from '../hooks/useKeypress.js';
 
@@ -44,21 +44,22 @@ export function AuthDialog({
     }
 
     const defaultAuthType = parseDefaultAuthType(
-      process.env['GEMINI_DEFAULT_AUTH_TYPE'],
+      process.env['AGENTIC_DEFAULT_AUTH_TYPE'] || process.env['GEMINI_DEFAULT_AUTH_TYPE'],
     );
 
-    if (process.env['GEMINI_DEFAULT_AUTH_TYPE'] && defaultAuthType === null) {
+    if ((process.env['AGENTIC_DEFAULT_AUTH_TYPE'] || process.env['GEMINI_DEFAULT_AUTH_TYPE']) && defaultAuthType === null) {
+      const envVarUsed = process.env['AGENTIC_DEFAULT_AUTH_TYPE'] || process.env['GEMINI_DEFAULT_AUTH_TYPE'];
       return (
-        `Invalid value for GEMINI_DEFAULT_AUTH_TYPE: "${process.env['GEMINI_DEFAULT_AUTH_TYPE']}". ` +
+        `Invalid value for authentication type: "${envVarUsed}". ` +
         `Valid values are: ${Object.values(AuthType).join(', ')}.`
       );
     }
 
     if (
-      process.env['GEMINI_API_KEY'] &&
+      (process.env['GEMINI_API_KEY'] || process.env['AGENTIC_API_KEY']) &&
       (!defaultAuthType || defaultAuthType === AuthType.USE_GEMINI)
     ) {
-      return 'Existing API key detected (GEMINI_API_KEY). Select "Gemini API Key" option to use it.';
+      return 'Existing API key detected. Select "Gemini API Key" option to use it.';
     }
     return null;
   });
@@ -76,6 +77,10 @@ export function AuthDialog({
         ]
       : []),
     {
+      label: 'Local LLM (Ollama)',
+      value: AuthType.LOCAL_LLM,
+    },
+    {
       label: 'Use Gemini API Key',
       value: AuthType.USE_GEMINI,
     },
@@ -88,17 +93,17 @@ export function AuthDialog({
     }
 
     const defaultAuthType = parseDefaultAuthType(
-      process.env['GEMINI_DEFAULT_AUTH_TYPE'],
+      process.env['AGENTIC_DEFAULT_AUTH_TYPE'] || process.env['GEMINI_DEFAULT_AUTH_TYPE'],
     );
     if (defaultAuthType) {
       return item.value === defaultAuthType;
     }
 
-    if (process.env['GEMINI_API_KEY']) {
+    if (process.env['GEMINI_API_KEY'] || process.env['AGENTIC_API_KEY']) {
       return item.value === AuthType.USE_GEMINI;
     }
 
-    return item.value === AuthType.LOGIN_WITH_GOOGLE;
+    return item.value === AuthType.LOCAL_LLM;
   });
 
   const handleAuthSelect = (authMethod: AuthType) => {
@@ -160,12 +165,12 @@ export function AuthDialog({
         <Text color={Colors.Gray}>(Use Enter to select)</Text>
       </Box>
       <Box marginTop={1}>
-        <Text>Terms of Services and Privacy Notice for Gemini CLI</Text>
+        <Text>Terms of Services and Privacy Notice for agentic-cli</Text>
       </Box>
       <Box marginTop={1}>
         <Text color={Colors.AccentBlue}>
           {
-            'https://github.com/google-gemini/gemini-cli/blob/main/docs/tos-privacy.md'
+            'https://github.com/bazobehram/agentic-cli/blob/main/docs/tos-privacy.md'
           }
         </Text>
       </Box>

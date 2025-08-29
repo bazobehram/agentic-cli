@@ -9,10 +9,10 @@ import * as path from 'node:path';
 import { homedir, platform } from 'node:os';
 import * as dotenv from 'dotenv';
 import {
-  GEMINI_CONFIG_DIR as GEMINI_DIR,
+  AGENTIC_CONFIG_DIR as AGENTIC_DIR,
   getErrorMessage,
   Storage,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import stripJsonComments from 'strip-json-comments';
 import { DefaultLight } from '../ui/themes/default-light.js';
 import { DefaultDark } from '../ui/themes/default.js';
@@ -22,7 +22,7 @@ import { mergeWith } from 'lodash-es';
 
 export type { Settings, MemoryImportFormat };
 
-export const SETTINGS_DIRECTORY_NAME = '.gemini';
+export const SETTINGS_DIRECTORY_NAME = '.agentic-cli';
 
 export const USER_SETTINGS_PATH = Storage.getGlobalSettingsPath();
 export const USER_SETTINGS_DIR = path.dirname(USER_SETTINGS_PATH);
@@ -81,21 +81,21 @@ const MIGRATION_MAP: Record<string, string> = {
 };
 
 export function getSystemSettingsPath(): string {
-  if (process.env['GEMINI_CLI_SYSTEM_SETTINGS_PATH']) {
-    return process.env['GEMINI_CLI_SYSTEM_SETTINGS_PATH'];
+  if (process.env['AGENTIC_CLI_SYSTEM_SETTINGS_PATH']) {
+    return process.env['AGENTIC_CLI_SYSTEM_SETTINGS_PATH'];
   }
   if (platform() === 'darwin') {
-    return '/Library/Application Support/GeminiCli/settings.json';
+    return '/Library/Application Support/AgenticCli/settings.json';
   } else if (platform() === 'win32') {
-    return 'C:\\ProgramData\\gemini-cli\\settings.json';
+    return 'C:\\ProgramData\\agentic-cli\\settings.json';
   } else {
-    return '/etc/gemini-cli/settings.json';
+    return '/etc/agentic-cli/settings.json';
   }
 }
 
 export function getSystemDefaultsPath(): string {
-  if (process.env['GEMINI_CLI_SYSTEM_DEFAULTS_PATH']) {
-    return process.env['GEMINI_CLI_SYSTEM_DEFAULTS_PATH'];
+  if (process.env['AGENTIC_CLI_SYSTEM_DEFAULTS_PATH']) {
+    return process.env['AGENTIC_CLI_SYSTEM_DEFAULTS_PATH'];
   }
   return path.join(
     path.dirname(getSystemSettingsPath()),
@@ -161,7 +161,21 @@ function setNestedProperty(
 }
 
 function needsMigration(settings: Record<string, unknown>): boolean {
-  return !('general' in settings);
+  // If the settings already have a 'general' key, it's v2
+  if ('general' in settings) {
+    return false;
+  }
+  
+  // If the settings have a nested model.selection structure, it's already v2
+  if ('model' in settings && typeof settings['model'] === 'object' && settings['model'] !== null) {
+    const modelObj = settings['model'] as Record<string, unknown>;
+    if ('selection' in modelObj) {
+      return false;
+    }
+  }
+  
+  // Otherwise, it needs migration
+  return true;
 }
 
 function migrateSettingsToV2(
@@ -505,10 +519,10 @@ function resolveEnvVarsInObject<T>(obj: T): T {
 function findEnvFile(startDir: string): string | null {
   let currentDir = path.resolve(startDir);
   while (true) {
-    // prefer gemini-specific .env under GEMINI_DIR
-    const geminiEnvPath = path.join(currentDir, GEMINI_DIR, '.env');
-    if (fs.existsSync(geminiEnvPath)) {
-      return geminiEnvPath;
+    // prefer agentic-specific .env under AGENTIC_DIR
+    const agenticEnvPath = path.join(currentDir, AGENTIC_DIR, '.env');
+    if (fs.existsSync(agenticEnvPath)) {
+      return agenticEnvPath;
     }
     const envPath = path.join(currentDir, '.env');
     if (fs.existsSync(envPath)) {
@@ -516,10 +530,10 @@ function findEnvFile(startDir: string): string | null {
     }
     const parentDir = path.dirname(currentDir);
     if (parentDir === currentDir || !parentDir) {
-      // check .env under home as fallback, again preferring gemini-specific .env
-      const homeGeminiEnvPath = path.join(homedir(), GEMINI_DIR, '.env');
-      if (fs.existsSync(homeGeminiEnvPath)) {
-        return homeGeminiEnvPath;
+      // check .env under home as fallback, again preferring agentic-specific .env
+      const homeAgenticEnvPath = path.join(homedir(), AGENTIC_DIR, '.env');
+      if (fs.existsSync(homeAgenticEnvPath)) {
+        return homeAgenticEnvPath;
       }
       const homeEnvPath = path.join(homedir(), '.env');
       if (fs.existsSync(homeEnvPath)) {
@@ -570,7 +584,7 @@ export function loadEnvironment(settings: Settings): void {
 
       const excludedVars =
         settings?.advanced?.excludedEnvVars || DEFAULT_EXCLUDED_ENV_VARS;
-      const isProjectEnvFile = !envFilePath.includes(GEMINI_DIR);
+      const isProjectEnvFile = !envFilePath.includes(AGENTIC_DIR);
 
       for (const key in parsedEnv) {
         if (Object.hasOwn(parsedEnv, key)) {

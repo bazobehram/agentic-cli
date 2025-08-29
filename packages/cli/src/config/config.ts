@@ -15,13 +15,13 @@ import type {
   TelemetryTarget,
   FileFilteringOptions,
   MCPServerConfig,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import { extensionsCommand } from '../commands/extensions.js';
 import {
   Config,
   loadServerHierarchicalMemory,
-  setGeminiMdFilename as setServerGeminiMdFilename,
-  getCurrentGeminiMdFilename,
+  setAgenticMdFilename as setServerAgenticMdFilename,
+  getCurrentAgenticMdFilename,
   ApprovalMode,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_EMBEDDING_MODEL,
@@ -30,7 +30,7 @@ import {
   ShellTool,
   EditTool,
   WriteFileTool,
-} from '@google/gemini-cli-core';
+} from 'agentic-cli-core';
 import type { Settings } from './settings.js';
 
 import type { Extension } from './extension.js';
@@ -82,17 +82,17 @@ export interface CliArgs {
 export async function parseArguments(settings: Settings): Promise<CliArgs> {
   const yargsInstance = yargs(hideBin(process.argv))
     .locale('en')
-    .scriptName('gemini')
+    .scriptName('agentic-cli')
     .usage(
-      'Usage: gemini [options] [command]\n\nGemini CLI - Launch an interactive CLI, use -p/--prompt for non-interactive mode',
+      'Usage: agentic-cli [options] [command]\n\nAgentic CLI - Launch an interactive CLI, use -p/--prompt for non-interactive mode',
     )
-    .command('$0', 'Launch Gemini CLI', (yargsInstance) =>
+    .command('$0', 'Launch agentic-cli', (yargsInstance) =>
       yargsInstance
         .option('model', {
           alias: 'm',
           type: 'string',
           description: `Model`,
-          default: process.env['GEMINI_MODEL'],
+          default: process.env['AGENTIC_MODEL'],
         })
         .option('prompt', {
           alias: 'p',
@@ -210,7 +210,7 @@ export async function parseArguments(settings: Settings): Promise<CliArgs> {
         .option('proxy', {
           type: 'string',
           description:
-            'Proxy for gemini client, like schema://user:password@host:port',
+            'Proxy for agentic-client, like schema://user:password@host:port',
         })
         .option('include-directories', {
           type: 'array',
@@ -350,13 +350,13 @@ export async function loadCliConfig(
 
   // Set the context filename in the server's memoryTool module BEFORE loading memory
   // TODO(b/343434939): This is a bit of a hack. The contextFileName should ideally be passed
-  // directly to the Config constructor in core, and have core handle setGeminiMdFilename.
+  // directly to the Config constructor in core, and have core handle setAgenticMdFilename.
   // However, loadHierarchicalGeminiMemory is called *before* createServerConfig.
   if (settings.context?.fileName) {
-    setServerGeminiMdFilename(settings.context.fileName);
+    setServerAgenticMdFilename(settings.context.fileName);
   } else {
     // Reset to default if not provided in settings.
-    setServerGeminiMdFilename(getCurrentGeminiMdFilename());
+    setServerAgenticMdFilename(getCurrentAgenticMdFilename());
   }
 
   const extensionContextFilePaths = activeExtensions.flatMap(
@@ -549,7 +549,20 @@ export async function loadCliConfig(
     cwd,
     fileDiscoveryService: fileService,
     bugCommand: settings.advanced?.bugCommand,
-    model: argv.model || settings.model?.name || DEFAULT_GEMINI_MODEL,
+    model: (() => {
+      let modelValue = argv.model || 
+        (settings.model?.selection?.mode === 'manual' 
+          ? settings.model?.selection?.preferredModel 
+          : settings.model?.name) || 
+        DEFAULT_GEMINI_MODEL;
+      
+      // Ensure model is always a string, never an object
+      if (typeof modelValue !== 'string') {
+        console.warn('Model value is not a string, falling back to default:', modelValue);
+        modelValue = DEFAULT_GEMINI_MODEL;
+      }
+      return modelValue;
+    })(),
     extensionContextFilePaths,
     maxSessionTurns: settings.model?.maxSessionTurns ?? -1,
     experimentalZedIntegration: argv.experimentalAcp || false,

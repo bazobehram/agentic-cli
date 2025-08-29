@@ -8,15 +8,15 @@ import { render } from 'ink-testing-library';
 import { describe, it, expect, vi } from 'vitest';
 import { Footer } from './Footer.js';
 import * as useTerminalSize from '../hooks/useTerminalSize.js';
-import { tildeifyPath } from '@google/gemini-cli-core';
+import { tildeifyPath } from 'agentic-cli-core';
 import path from 'node:path';
 
 vi.mock('../hooks/useTerminalSize.js');
 const useTerminalSizeMock = vi.mocked(useTerminalSize.useTerminalSize);
 
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
+vi.mock('agentic-cli-core', async (importOriginal) => {
   const original =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+    await importOriginal<typeof import('agentic-cli-core')>();
   return {
     ...original,
     shortenPath: (p: string, len: number) => {
@@ -114,7 +114,7 @@ describe('<Footer />', () => {
     });
 
     it('should display custom sandbox info when SANDBOX env is set', () => {
-      vi.stubEnv('SANDBOX', 'gemini-cli-test-sandbox');
+      vi.stubEnv('SANDBOX', 'agentic-cli-test-sandbox');
       const { lastFrame } = renderWithWidth(120, {
         ...defaultProps,
         isTrustedFolder: undefined,
@@ -146,7 +146,7 @@ describe('<Footer />', () => {
     });
 
     it('should prioritize untrusted message over sandbox info', () => {
-      vi.stubEnv('SANDBOX', 'gemini-cli-test-sandbox');
+      vi.stubEnv('SANDBOX', 'agentic-cli-test-sandbox');
       const { lastFrame } = renderWithWidth(120, {
         ...defaultProps,
         isTrustedFolder: false,

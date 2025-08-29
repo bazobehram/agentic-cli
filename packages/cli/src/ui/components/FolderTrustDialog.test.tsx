@@ -66,7 +66,7 @@ describe('FolderTrustDialog', () => {
     );
 
     expect(lastFrame()).toContain(
-      'To see changes, Gemini CLI must be restarted',
+      'To see changes, agentic-cli must be restarted',
     );
   });
 

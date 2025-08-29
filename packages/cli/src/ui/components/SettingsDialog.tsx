@@ -750,7 +750,7 @@ export function SettingsDialog({
                         : Colors.Foreground
                   }
                 >
-                  {displayValue}
+                  {typeof displayValue === 'object' ? '[Object]' : displayValue}
                 </Text>
               </Box>
               <Box height={1} />
@@ -781,7 +781,7 @@ export function SettingsDialog({
         </Text>
         {showRestartPrompt && (
           <Text color={Colors.AccentYellow}>
-            To see changes, Gemini CLI must be restarted. Press r to exit and
+            To see changes, agentic-cli must be restarted. Press r to exit and
             apply changes now.
           </Text>
         )}

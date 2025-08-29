@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { DetectedIde } from '@google/gemini-cli-core';
-import { getIdeInfo } from '@google/gemini-cli-core';
+import type { DetectedIde } from 'agentic-cli-core';
+import { getIdeInfo } from 'agentic-cli-core';
 import { Box, Text } from 'ink';
 import type { RadioSelectItem } from './components/shared/RadioButtonSelect.js';
 import { RadioButtonSelect } from './components/shared/RadioButtonSelect.js';
@@ -87,7 +87,7 @@ export function IdeIntegrationNudge({
       <Box marginBottom={1} flexDirection="column">
         <Text>
           <Text color="yellow">{'> '}</Text>
-          {`Do you want to connect ${ideName ?? 'your editor'} to Gemini CLI?`}
+          {`Do you want to connect ${ideName ?? 'your editor'} to agentic-cli?`}
         </Text>
         <Text dimColor>{installText}</Text>
       </Box>

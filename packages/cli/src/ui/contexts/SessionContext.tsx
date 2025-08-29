@@ -14,8 +14,8 @@ import {
   useEffect,
 } from 'react';
 
-import type { SessionMetrics, ModelMetrics } from '@google/gemini-cli-core';
-import { uiTelemetryService, sessionId } from '@google/gemini-cli-core';
+import type { SessionMetrics, ModelMetrics } from 'agentic-cli-core';
+import { uiTelemetryService, sessionId } from 'agentic-cli-core';
 
 // --- Interface Definitions ---
 
